@@ -148,10 +148,7 @@
 <div class="page-indicator" id="page-indicator"></div>
 
 <script type="module">
-  // ── CONFIGURATION ─────────────────────────────────────────
-  // Point this to wherever you host the PDF.
   const PDF_URL = 'The_MAD_Act_Complete_Final.pdf';
-  // ──────────────────────────────────────────────────────────
 
   const TOC = [
     {label: "Sec. 1 — Short Title & Table of Contents", page: 0},
@@ -181,7 +178,7 @@
   const tocList = document.getElementById("toc-list");
 
   function getTargetWidth() {
-    return Math.min(680, wrapper.clientWidth - 32);
+    return wrapper.clientWidth - 40;
   }
 
   function openToc() {
@@ -223,7 +220,6 @@
     ph.replaceChildren(canvas);
   }
 
-  // Build TOC
   TOC.forEach((item) => {
     const btn = document.createElement("button");
     btn.className = "toc-item";
