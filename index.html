@@ -439,16 +439,22 @@
           btn.className = "toc-item";
           btn.innerHTML = item.label;
           btn.addEventListener("click", () => {
-            const anchor = TOC_ANCHORS[idx];
-            // Find the element containing this text
-            const allEls = div.querySelectorAll("p, blockquote p");
-            for (const el of allEls) {
-              if (el.textContent.includes(anchor)) {
-                el.scrollIntoView({ behavior: "smooth", block: "start" });
-                break;
-              }
-            }
             closeAll();
+            setTimeout(() => {
+              const anchor = TOC_ANCHORS[idx];
+              const allEls = div.querySelectorAll("p, blockquote p");
+              for (const el of allEls) {
+                if (el.textContent.includes(anchor)) {
+                  el.scrollIntoView({ behavior: "smooth", block: "center" });
+                  el.style.transition = "background 0.3s, outline 0.3s";
+                  el.style.background = "rgba(143, 35, 71, 0.18)";
+                  el.style.outline = "2px solid #8f2347";
+                  el.style.outlineOffset = "4px";
+                  setTimeout(() => { el.style.background = ""; el.style.outline = ""; el.style.outlineOffset = ""; }, 3000);
+                  break;
+                }
+              }
+            }, 400);
           });
           tocList.appendChild(btn);
         });
@@ -477,7 +483,19 @@
             btn.className = "search-result-item";
             const hl = m.snippet.replace(new RegExp("(" + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ")", "gi"), "<mark>$1</mark>");
             btn.innerHTML = hl;
-            btn.addEventListener("click", () => { m.el.scrollIntoView({ behavior: "smooth", block: "start" }); closeAll(); });
+            btn.addEventListener("click", () => {
+              closeAll();
+              setTimeout(() => {
+                // Scroll the element to center of viewport for best visibility
+                m.el.scrollIntoView({ behavior: "smooth", block: "center" });
+                // Strong highlight so user can see exactly what matched
+                m.el.style.transition = "background 0.3s, outline 0.3s";
+                m.el.style.background = "rgba(143, 35, 71, 0.18)";
+                m.el.style.outline = "2px solid #8f2347";
+                m.el.style.outlineOffset = "4px";
+                setTimeout(() => { m.el.style.background = ""; m.el.style.outline = ""; m.el.style.outlineOffset = ""; }, 3000);
+              }, 400);
+            });
             searchResults.appendChild(btn);
           });
         }
@@ -546,14 +564,26 @@
       ph.replaceChildren(pw);
     }
 
-    function goToPage(pageIndex) {
+    async function goToPage(pageIndex) {
       const target = placeholders[pageIndex];
-      if (target && window._pdf) {
-        for (let p = pageIndex; p <= Math.min(pageIndex + 10, totalPages - 1); p++) {
-          renderPage(window._pdf, p + 1);
-        }
-        setTimeout(() => target.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+      if (!target || !window._pdf) return;
+
+      // Render target and surrounding pages and WAIT for completion
+      const promises = [];
+      for (let p = Math.max(0, pageIndex - 2); p <= Math.min(pageIndex + 10, totalPages - 1); p++) {
+        promises.push(renderPage(window._pdf, p + 1));
       }
+      await Promise.all(promises);
+
+      // Wait one frame for layout to settle
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+      // Scroll with title bar offset
+      const titleBarHeight = document.querySelector('.title-bar').offsetHeight + 12;
+      const wrapperTop = wrapper.getBoundingClientRect().top;
+      const targetTop = target.getBoundingClientRect().top;
+      const scrollTarget = wrapper.scrollTop + (targetTop - wrapperTop) - titleBarHeight;
+      wrapper.scrollTo({ top: scrollTarget, behavior: "smooth" });
     }
 
     // TOC for desktop
@@ -561,7 +591,7 @@
       const btn = document.createElement("button");
       btn.className = "toc-item";
       btn.innerHTML = item.label + '<span class="page-num">Page ' + (item.page + 1) + '</span>';
-      btn.addEventListener("click", () => { goToPage(item.page); closeAll(); });
+      btn.addEventListener("click", async () => { closeAll(); await goToPage(item.page); });
       tocList.appendChild(btn);
     });
 
@@ -601,7 +631,7 @@
         btn.className = "search-result-item";
         const hl = m.snippet.replace(new RegExp("(" + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ")", "gi"), "<mark>$1</mark>");
         btn.innerHTML = '<span class="result-page">Page ' + m.page + '</span> ' + hl;
-        btn.addEventListener("click", () => { goToPage(m.page - 1); closeAll(); });
+        btn.addEventListener("click", async () => { closeAll(); await goToPage(m.page - 1); });
         searchResults.appendChild(btn);
       });
     }
