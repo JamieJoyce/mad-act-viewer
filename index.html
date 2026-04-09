@@ -131,6 +131,8 @@
   .toolbar-tweet { background: #1DA1F2; color: #fff; }
   .toolbar-tweet:hover { background: #0d8ddb; }
   .toolbar-copied { background: #28a745; color: #fff; }
+  .toolbar-bsky { background: #0085FF; color: #fff; }
+  .toolbar-bsky:hover { background: #0066CC; }
 
   .progress-bar {
     position: sticky; top: 0; width: 100%; height: 4px;
@@ -270,6 +272,7 @@
 <div class="selection-toolbar" id="selection-toolbar">
   <button class="toolbar-copy" id="toolbar-copy">&#128203; Copy</button>
   <button class="toolbar-tweet" id="toolbar-tweet">&#120143; Post</button>
+  <button class="toolbar-bsky" id="toolbar-bsky">&#129419; Bluesky</button>
 </div>
 
 <div class="viewer-wrapper" id="viewer-wrapper">
@@ -396,6 +399,14 @@
       const url = encodeURIComponent(window.location.href);
       const tweetText = encodeURIComponent('"' + text + '"\n\n— The MAD Act');
       window.open("https://x.com/intent/tweet?text=" + tweetText + "&url=" + url, "_blank");
+      selToolbar.classList.remove("visible");
+    }
+  });
+  document.getElementById("toolbar-bsky").addEventListener("click", () => {
+    const text = window.getSelection().toString().substring(0, 250);
+    if (text) {
+      const bskyText = encodeURIComponent('"' + text + '"\n\n— The MAD Act\n\n' + window.location.href);
+      window.open("https://bsky.app/intent/compose?text=" + bskyText, "_blank");
       selToolbar.classList.remove("visible");
     }
   });
