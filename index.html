@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<title>The MAD Act</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: #e8e8e8; overflow: hidden; font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+  .viewer-wrapper {
+    width: 100%; height: 100vh;
+    overflow-y: scroll; overflow-x: hidden;
+    background: #e8e8e8;
+    scrollbar-width: auto;
+    scrollbar-color: #8f2347 #e8d0d9;
+  }
+  .viewer-wrapper::-webkit-scrollbar { width: 16px; -webkit-appearance: none; }
+  .viewer-wrapper::-webkit-scrollbar-track { background: #e8d0d9; }
+  .viewer-wrapper::-webkit-scrollbar-thumb {
+    background: #8f2347; border-radius: 8px;
+    border: 2px solid #e8d0d9; min-height: 40px;
+  }
+  .viewer-wrapper::-webkit-scrollbar-thumb:hover { background: #6b1a35; }
+
+  #page-container {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 20px 0; gap: 12px;
+    touch-action: pan-y pinch-zoom;
+  }
+  #page-container canvas {
+    display: block; background: #fff;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.15);
+    max-width: 100%; height: auto;
+  }
+
+  .progress-bar {
+    position: sticky; top: 0; width: 100%; height: 4px;
+    background: #e8d0d9; z-index: 200;
+  }
+  .progress-bar .fill { height: 100%; width: 0%; background: #8f2347; transition: width 0.15s ease; }
+
+  .page-indicator {
+    position: fixed; bottom: 16px; right: 28px;
+    background: #8f2347; color: #fff; font-size: 13px;
+    padding: 6px 14px; border-radius: 20px;
+    opacity: 0; transition: opacity 0.3s ease;
+    z-index: 300; pointer-events: none;
+  }
+  .page-indicator.visible { opacity: 0.92; }
+
+  .toc-toggle {
+    position: fixed; top: 14px; left: 14px; z-index: 400;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #8f2347; color: #fff; border: none;
+    font-size: 20px; cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .toc-toggle:hover { background: #6b1a35; }
+  .toc-toggle.open { background: #6b1a35; }
+
+  .toc-panel {
+    position: fixed; top: 0; left: 0; z-index: 350;
+    width: 320px; max-width: 85vw; height: 100vh;
+    background: #fff; box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .toc-panel.open { transform: translateX(0); }
+
+  .toc-header {
+    padding: 20px 20px 14px 20px;
+    border-bottom: 2px solid #8f2347;
+  }
+  .toc-header h2 {
+    font-size: 15px; font-weight: 700; color: #8f2347;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+
+  .toc-list {
+    flex: 1; overflow-y: auto; padding: 8px 0;
+    scrollbar-width: thin; scrollbar-color: #8f2347 #f5f0f2;
+  }
+  .toc-list::-webkit-scrollbar { width: 6px; }
+  .toc-list::-webkit-scrollbar-thumb { background: #8f2347; border-radius: 3px; }
+
+  .toc-item {
+    display: block; width: 100%; text-align: left;
+    padding: 14px 20px; border: none; background: none;
+    font-size: 14px; color: #333; cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.15s ease; line-height: 1.4;
+  }
+  .toc-item:hover {
+    background: #faf0f3; border-left-color: #8f2347; color: #8f2347;
+  }
+  .toc-item .page-num {
+    display: block; font-size: 11px; color: #999; margin-top: 2px;
+  }
+
+  .toc-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3); z-index: 340;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .toc-overlay.open { opacity: 1; pointer-events: auto; }
+
+  .loading-msg {
+    text-align: center; padding: 80px 20px; color: #555; font-size: 16px;
+  }
+  .loading-msg .spinner {
+    display: inline-block; width: 28px; height: 28px;
+    border: 3px solid #ddd; border-top-color: #8f2347;
+    border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 720px) {
+    #page-container { padding: 8px 0; gap: 6px; }
+    #page-container canvas { box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .page-indicator { bottom: 10px; right: 14px; font-size: 12px; padding: 5px 11px; }
+    .toc-toggle { top: 10px; left: 10px; width: 40px; height: 40px; font-size: 18px; }
+    .viewer-wrapper::-webkit-scrollbar { width: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="toc-toggle" id="toc-toggle" aria-label="Table of Contents">&#9776;</button>
+<div class="toc-overlay" id="toc-overlay"></div>
+<nav class="toc-panel" id="toc-panel">
+  <div class="toc-header"><h2>Table of Contents</h2></div>
+  <div class="toc-list" id="toc-list"></div>
+</nav>
+
+<div class="viewer-wrapper" id="viewer-wrapper">
+  <div class="progress-bar"><div class="fill" id="progress-fill"></div></div>
+  <div id="page-container">
+    <div class="loading-msg" id="loading">
+      <div class="spinner"></div>
+      <div>Loading the MAD Act…</div>
+    </div>
+  </div>
+</div>
+<div class="page-indicator" id="page-indicator"></div>
+
+<script type="module">
+  // ── CONFIGURATION ─────────────────────────────────────────
+  // Point this to wherever you host the PDF.
+  const PDF_URL = 'The_MAD_Act_Complete_Final.pdf';
+  // ──────────────────────────────────────────────────────────
+
+  const TOC = [
+    {label: "Sec. 1 — Short Title & Table of Contents", page: 0},
+    {label: "Sec. 2 — Findings and Purpose", page: 1},
+    {label: "Title I — Surveillance, Privacy & Executive Accountability", page: 10},
+    {label: "Title II — Demanding a Plan for AI", page: 215},
+    {label: "Title III — Insurrection Act Reform", page: 446},
+    {label: "Title IV — Political Spending Disclosure", page: 464},
+    {label: "Title V — Digitization & Preservation of Federal Records", page: 493},
+    {label: "Title VI — Voter Choice & Election Modernization", page: 512},
+    {label: "Title VII — Epstein Accountability & Public Disclosure", page: 541},
+    {label: "Title VIII — Immigration Enforcement Agent Safety", page: 615},
+    {label: "Title IX — Political Violence Investigation Accountability", page: 650},
+  ];
+
+  const pdfjsLib = await import("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs");
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
+
+  const container = document.getElementById("page-container");
+  const wrapper = document.getElementById("viewer-wrapper");
+  const loading = document.getElementById("loading");
+  const progressFill = document.getElementById("progress-fill");
+  const pageIndicator = document.getElementById("page-indicator");
+  const tocToggle = document.getElementById("toc-toggle");
+  const tocPanel = document.getElementById("toc-panel");
+  const tocOverlay = document.getElementById("toc-overlay");
+  const tocList = document.getElementById("toc-list");
+
+  function getTargetWidth() {
+    return Math.min(680, wrapper.clientWidth - 32);
+  }
+
+  function openToc() {
+    tocPanel.classList.add("open");
+    tocOverlay.classList.add("open");
+    tocToggle.classList.add("open");
+  }
+  function closeToc() {
+    tocPanel.classList.remove("open");
+    tocOverlay.classList.remove("open");
+    tocToggle.classList.remove("open");
+  }
+  tocToggle.addEventListener("click", () => {
+    tocPanel.classList.contains("open") ? closeToc() : openToc();
+  });
+  tocOverlay.addEventListener("click", closeToc);
+
+  let placeholders = [], rendered = new Set(), totalPages = 0;
+
+  async function renderPage(pdf, pageNum) {
+    if (rendered.has(pageNum)) return;
+    rendered.add(pageNum);
+    const page = await pdf.getPage(pageNum);
+    const uv = page.getViewport({ scale: 1 });
+    const tw = getTargetWidth();
+    const scale = tw / uv.width;
+    const vp = page.getViewport({ scale });
+    const dpr = window.devicePixelRatio || 1;
+    const canvas = document.createElement("canvas");
+    canvas.width = vp.width * dpr;
+    canvas.height = vp.height * dpr;
+    canvas.style.width = vp.width + "px";
+    canvas.style.height = vp.height + "px";
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    await page.render({ canvasContext: ctx, viewport: vp }).promise;
+    const ph = placeholders[pageNum - 1];
+    ph.style.minHeight = "";
+    ph.replaceChildren(canvas);
+  }
+
+  // Build TOC
+  TOC.forEach((item) => {
+    const btn = document.createElement("button");
+    btn.className = "toc-item";
+    btn.innerHTML = item.label + '<span class="page-num">Page ' + (item.page + 1) + '</span>';
+    btn.addEventListener("click", () => {
+      const target = placeholders[item.page];
+      if (target && window._pdf) {
+        for (let p = item.page; p <= Math.min(item.page + 10, totalPages - 1); p++) {
+          renderPage(window._pdf, p + 1);
+        }
+        setTimeout(() => target.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+      }
+      closeToc();
+    });
+    tocList.appendChild(btn);
+  });
+
+  try {
+    const pdf = await pdfjsLib.getDocument(PDF_URL).promise;
+    window._pdf = pdf;
+    loading.remove();
+    totalPages = pdf.numPages;
+    const BATCH = 10;
+
+    for (let i = 1; i <= totalPages; i++) {
+      const div = document.createElement("div");
+      div.dataset.page = i;
+      div.style.minHeight = "880px";
+      container.appendChild(div);
+      placeholders.push(div);
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          const p = parseInt(entry.target.dataset.page);
+          for (let i = p; i <= Math.min(p + BATCH, totalPages); i++) renderPage(pdf, i);
+        }
+      }
+    }, { root: wrapper, rootMargin: "1500px" });
+
+    placeholders.forEach(div => observer.observe(div));
+    for (let p = 1; p <= Math.min(BATCH, totalPages); p++) renderPage(pdf, p);
+
+    let indicatorTimeout;
+    wrapper.addEventListener("scroll", () => {
+      const scrollTop = wrapper.scrollTop;
+      const scrollHeight = wrapper.scrollHeight - wrapper.clientHeight;
+      const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+      progressFill.style.width = pct + "%";
+
+      let currentPage = 1;
+      for (let i = 0; i < placeholders.length; i++) {
+        const rect = placeholders[i].getBoundingClientRect();
+        const wrapperRect = wrapper.getBoundingClientRect();
+        if (rect.top <= wrapperRect.top + wrapperRect.height * 0.3) currentPage = i + 1;
+      }
+      pageIndicator.textContent = "Page " + currentPage + " of " + totalPages;
+      pageIndicator.classList.add("visible");
+      clearTimeout(indicatorTimeout);
+      indicatorTimeout = setTimeout(() => pageIndicator.classList.remove("visible"), 1500);
+    });
+
+  } catch (err) {
+    loading.innerHTML = '<div style="color:#c00;">Error loading PDF. Make sure the PDF file is hosted at the same location as this HTML file.<br><br>' + err.message + '</div>';
+    console.error(err);
+  }
+</script>
+
+</body>
+</html>
