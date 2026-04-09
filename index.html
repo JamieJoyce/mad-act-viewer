@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>The MAD Act</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; background: #e8e8e8; overflow: hidden; font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; }
@@ -11,15 +12,19 @@
   .title-bar {
     position: sticky; top: 0; z-index: 250;
     background: #8f2347; color: #fff;
-    text-align: center; padding: 14px 60px;
-    font-size: 18px; font-weight: 700;
-    letter-spacing: 1px; text-transform: uppercase;
+    text-align: center; padding: 16px 60px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
+  .title-bar .title-main {
+    font-family: "Libre Baskerville", "ITC New Baskerville", Baskerville, "Baskerville Old Face", Georgia, serif;
+    font-size: 22px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+  }
   .title-bar .subtitle {
-    font-size: 11px; font-weight: 400;
-    letter-spacing: 0.5px; opacity: 0.8;
-    margin-top: 2px; text-transform: none;
+    font-family: "Libre Baskerville", "ITC New Baskerville", Baskerville, "Baskerville Old Face", Georgia, serif;
+    font-size: 12px; font-weight: 400; font-style: italic;
+    letter-spacing: 0.5px; opacity: 0.85;
+    margin-top: 4px;
   }
 
   .viewer-wrapper {
@@ -42,11 +47,51 @@
     padding: 20px 0; gap: 12px;
     touch-action: pan-y pinch-zoom;
   }
-  #page-container canvas {
-    display: block; background: #fff;
+
+  .page-wrapper {
+    position: relative;
     box-shadow: 0 1px 6px rgba(0,0,0,0.15);
-    max-width: 100%; height: auto;
+    background: #fff;
   }
+  .page-wrapper canvas { display: block; }
+
+  .text-layer {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    overflow: hidden; opacity: 0.25; line-height: 1;
+  }
+  .text-layer span {
+    position: absolute; white-space: pre;
+    color: transparent; cursor: text;
+  }
+  .text-layer span::selection {
+    background: rgba(143, 35, 71, 0.35); color: transparent;
+  }
+  .text-layer span::-moz-selection {
+    background: rgba(143, 35, 71, 0.35); color: transparent;
+  }
+
+  .selection-toolbar {
+    position: fixed; z-index: 500;
+    display: none; background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    padding: 6px; gap: 4px;
+    align-items: center;
+    transform: translateX(-50%);
+  }
+  .selection-toolbar.visible { display: flex; }
+  .selection-toolbar button {
+    padding: 8px 14px; border: none; border-radius: 7px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: background 0.15s;
+  }
+  .toolbar-copy { background: #8f2347; color: #fff; }
+  .toolbar-copy:hover { background: #6b1a35; }
+  .toolbar-tweet { background: #1DA1F2; color: #fff; }
+  .toolbar-tweet:hover { background: #0d8ddb; }
+  .toolbar-copied { background: #28a745; color: #fff; }
 
   .progress-bar {
     position: sticky; top: 0; width: 100%; height: 4px;
@@ -63,7 +108,6 @@
   }
   .page-indicator.visible { opacity: 0.92; }
 
-  /* TOC button */
   .toc-toggle {
     position: fixed; top: 14px; left: 14px; z-index: 400;
     width: 44px; height: 44px; border-radius: 50%;
@@ -74,9 +118,7 @@
     transition: background 0.2s;
   }
   .toc-toggle:hover { background: #fff; }
-  .toc-toggle.open { background: #fff; }
 
-  /* Search button */
   .search-toggle {
     position: fixed; top: 14px; right: 14px; z-index: 400;
     width: 44px; height: 44px; border-radius: 50%;
@@ -88,7 +130,6 @@
   }
   .search-toggle:hover { background: #fff; }
 
-  /* Search panel */
   .search-panel {
     position: fixed; top: 0; right: 0; z-index: 350;
     width: 360px; max-width: 90vw; height: 100vh;
@@ -106,7 +147,6 @@
   .search-header input {
     flex: 1; padding: 10px 14px; border: 2px solid #ddd;
     border-radius: 8px; font-size: 14px; outline: none;
-    transition: border-color 0.2s;
   }
   .search-header input:focus { border-color: #8f2347; }
   .search-header button {
@@ -138,14 +178,9 @@
   .search-result-item:hover {
     background: #faf0f3; border-left-color: #8f2347; color: #8f2347;
   }
-  .search-result-item .result-page {
-    font-size: 11px; color: #8f2347; font-weight: 600;
-  }
-  .search-result-item mark {
-    background: #f8d0de; color: #8f2347; padding: 0 2px; border-radius: 2px;
-  }
+  .search-result-item .result-page { font-size: 11px; color: #8f2347; font-weight: 600; }
+  .search-result-item mark { background: #f8d0de; color: #8f2347; padding: 0 2px; border-radius: 2px; }
 
-  /* TOC panel */
   .toc-panel {
     position: fixed; top: 0; left: 0; z-index: 350;
     width: 320px; max-width: 85vw; height: 100vh;
@@ -204,10 +239,11 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   @media (max-width: 720px) {
-    .title-bar { padding: 10px 50px; font-size: 15px; }
+    .title-bar { padding: 12px 50px; }
+    .title-bar .title-main { font-size: 17px; letter-spacing: 1px; }
     .title-bar .subtitle { font-size: 10px; }
     #page-container { padding: 8px 0; gap: 6px; }
-    #page-container canvas { box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .page-wrapper { box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
     .page-indicator { bottom: 10px; right: 14px; font-size: 12px; padding: 5px 11px; }
     .toc-toggle { top: 10px; left: 10px; width: 40px; height: 40px; font-size: 18px; }
     .search-toggle { top: 10px; right: 10px; width: 40px; height: 40px; font-size: 18px; }
@@ -235,9 +271,14 @@
   <div class="search-results" id="search-results"></div>
 </div>
 
+<div class="selection-toolbar" id="selection-toolbar">
+  <button class="toolbar-copy" id="toolbar-copy">&#128203; Copy</button>
+  <button class="toolbar-tweet" id="toolbar-tweet">&#120143; Post</button>
+</div>
+
 <div class="viewer-wrapper" id="viewer-wrapper">
   <div class="title-bar">
-    The MAD Act
+    <div class="title-main">The MAD Act</div>
     <div class="subtitle">Mass Accountability in Democracy Act</div>
   </div>
   <div class="progress-bar"><div class="fill" id="progress-fill"></div></div>
@@ -285,23 +326,23 @@
   const searchResults = document.getElementById("search-results");
   const panelOverlay = document.getElementById("panel-overlay");
   const tocList = document.getElementById("toc-list");
+  const selToolbar = document.getElementById("selection-toolbar");
+  const toolbarCopy = document.getElementById("toolbar-copy");
+  const toolbarTweet = document.getElementById("toolbar-tweet");
 
   function getTargetWidth() {
     return wrapper.clientWidth - 40;
   }
 
-  // Panel management
   function closeAll() {
     tocPanel.classList.remove("open");
     searchPanel.classList.remove("open");
     panelOverlay.classList.remove("open");
-    tocToggle.classList.remove("open");
   }
   function openToc() {
     closeAll();
     tocPanel.classList.add("open");
     panelOverlay.classList.add("open");
-    tocToggle.classList.add("open");
   }
   function openSearch() {
     closeAll();
@@ -329,6 +370,7 @@
     const scale = tw / uv.width;
     const vp = page.getViewport({ scale });
     const dpr = window.devicePixelRatio || 1;
+
     const canvas = document.createElement("canvas");
     canvas.width = vp.width * dpr;
     canvas.height = vp.height * dpr;
@@ -337,9 +379,35 @@
     const ctx = canvas.getContext("2d");
     ctx.scale(dpr, dpr);
     await page.render({ canvasContext: ctx, viewport: vp }).promise;
+
+    const textContent = await page.getTextContent();
+    const textLayerDiv = document.createElement("div");
+    textLayerDiv.className = "text-layer";
+    textLayerDiv.style.width = vp.width + "px";
+    textLayerDiv.style.height = vp.height + "px";
+
+    textContent.items.forEach(item => {
+      const tx = pdfjsLib.Util.transform(vp.transform, item.transform);
+      const span = document.createElement("span");
+      span.textContent = item.str;
+      const fontHeight = Math.sqrt(tx[2] * tx[2] + tx[3] * tx[3]);
+      span.style.left = tx[4] + "px";
+      span.style.top = (vp.height - tx[5]) + "px";
+      span.style.fontSize = fontHeight + "px";
+      span.style.fontFamily = item.fontName || "serif";
+      textLayerDiv.appendChild(span);
+    });
+
+    const pageWrapper = document.createElement("div");
+    pageWrapper.className = "page-wrapper";
+    pageWrapper.style.width = vp.width + "px";
+    pageWrapper.style.height = vp.height + "px";
+    pageWrapper.appendChild(canvas);
+    pageWrapper.appendChild(textLayerDiv);
+
     const ph = placeholders[pageNum - 1];
     ph.style.minHeight = "";
-    ph.replaceChildren(canvas);
+    ph.replaceChildren(pageWrapper);
   }
 
   function goToPage(pageIndex) {
@@ -352,13 +420,59 @@
     }
   }
 
-  // Build TOC
+  // TOC
   TOC.forEach((item) => {
     const btn = document.createElement("button");
     btn.className = "toc-item";
     btn.innerHTML = item.label + '<span class="page-num">Page ' + (item.page + 1) + '</span>';
     btn.addEventListener("click", () => { goToPage(item.page); closeAll(); });
     tocList.appendChild(btn);
+  });
+
+  // Selection toolbar
+  function showToolbar() {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.toString().trim()) {
+      selToolbar.classList.remove("visible");
+      return;
+    }
+    const range = sel.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+    selToolbar.style.left = (rect.left + rect.width / 2) + "px";
+    selToolbar.style.top = (rect.top - 50) + "px";
+    if (rect.top < 60) {
+      selToolbar.style.top = (rect.bottom + 10) + "px";
+    }
+    toolbarCopy.innerHTML = "&#128203; Copy";
+    toolbarCopy.className = "toolbar-copy";
+    selToolbar.classList.add("visible");
+  }
+
+  document.addEventListener("mouseup", () => setTimeout(showToolbar, 10));
+  document.addEventListener("touchend", () => setTimeout(showToolbar, 100));
+  document.addEventListener("mousedown", (e) => {
+    if (!selToolbar.contains(e.target)) selToolbar.classList.remove("visible");
+  });
+
+  toolbarCopy.addEventListener("click", () => {
+    const text = window.getSelection().toString();
+    if (text) {
+      navigator.clipboard.writeText(text).then(() => {
+        toolbarCopy.innerHTML = "&#10003; Copied!";
+        toolbarCopy.className = "toolbar-copied";
+        setTimeout(() => selToolbar.classList.remove("visible"), 1200);
+      });
+    }
+  });
+
+  toolbarTweet.addEventListener("click", () => {
+    const text = window.getSelection().toString().substring(0, 250);
+    if (text) {
+      const url = encodeURIComponent(window.location.href);
+      const tweetText = encodeURIComponent('"' + text + '"\n\n— The MAD Act');
+      window.open("https://x.com/intent/tweet?text=" + tweetText + "&url=" + url, "_blank");
+      selToolbar.classList.remove("visible");
+    }
   });
 
   // Search
@@ -376,7 +490,6 @@
     const q = query.trim().toLowerCase();
     searchResults.innerHTML = "";
     searchStatus.textContent = "Searching…";
-
     const matches = [];
     for (let i = 1; i <= totalPages; i++) {
       const text = await getPageText(window._pdf, i);
@@ -386,20 +499,18 @@
         const start = Math.max(0, idx - 40);
         const end = Math.min(text.length, idx + q.length + 40);
         let snippet = (start > 0 ? "…" : "") + text.substring(start, end) + (end < text.length ? "…" : "");
-        matches.push({ page: i, snippet, idx });
+        matches.push({ page: i, snippet });
       }
       if (i % 50 === 0) {
         searchStatus.textContent = "Searching… (page " + i + " of " + totalPages + ")";
         await new Promise(r => setTimeout(r, 0));
       }
     }
-
     if (matches.length === 0) {
       searchStatus.textContent = "No results found.";
       return;
     }
     searchStatus.textContent = matches.length + " page" + (matches.length !== 1 ? "s" : "") + " found";
-
     matches.forEach(m => {
       const btn = document.createElement("button");
       btn.className = "search-result-item";
@@ -415,6 +526,7 @@
     if (e.key === "Enter") doSearch(searchInput.value);
   });
 
+  // Load PDF
   try {
     const pdf = await pdfjsLib.getDocument(PDF_URL).promise;
     window._pdf = pdf;
