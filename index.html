@@ -16,15 +16,14 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
   .title-bar .title-main {
-    font-family: "Libre Baskerville", "ITC New Baskerville", Baskerville, "Baskerville Old Face", Georgia, serif;
+    font-family: "Libre Baskerville", "ITC New Baskerville", Baskerville, Georgia, serif;
     font-size: 22px; font-weight: 700;
     letter-spacing: 2px; text-transform: uppercase;
   }
   .title-bar .subtitle {
-    font-family: "Libre Baskerville", "ITC New Baskerville", Baskerville, "Baskerville Old Face", Georgia, serif;
+    font-family: "Libre Baskerville", "ITC New Baskerville", Baskerville, Georgia, serif;
     font-size: 12px; font-weight: 400; font-style: italic;
-    letter-spacing: 0.5px; opacity: 0.85;
-    margin-top: 4px;
+    letter-spacing: 0.5px; opacity: 0.85; margin-top: 4px;
   }
 
   .viewer-wrapper {
@@ -64,11 +63,53 @@
     position: absolute; white-space: pre;
     color: transparent; cursor: text;
   }
-  .text-layer span::selection {
-    background: rgba(143, 35, 71, 0.35); color: transparent;
+  .text-layer span::selection { background: rgba(143, 35, 71, 0.35); color: transparent; }
+  .text-layer span::-moz-selection { background: rgba(143, 35, 71, 0.35); color: transparent; }
+
+  /* Mobile text view */
+  .mobile-content {
+    background: #fff; padding: 24px 20px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 16px; line-height: 1.65; color: #1a1a1a;
   }
-  .text-layer span::-moz-selection {
-    background: rgba(143, 35, 71, 0.35); color: transparent;
+  .mobile-content p { margin-top: 10px; }
+  .mobile-content .bill-title {
+    margin-top: 28px; padding: 14px 0 8px;
+    font-size: 17px; text-align: center;
+    color: #8f2347; border-top: 2px solid #e8d0d9;
+  }
+  .mobile-content .bill-section {
+    margin-top: 22px; padding-top: 8px;
+    font-size: 16px; color: #333;
+  }
+  .mobile-content .bill-subtitle {
+    margin-top: 16px; font-size: 15px; color: #555;
+  }
+  .mobile-content .bill-part {
+    margin-top: 18px; font-size: 15px; color: #8f2347;
+  }
+  .mobile-content .bill-toc-entry {
+    margin-top: 4px; padding-left: 12px;
+    font-size: 14px; color: #555;
+  }
+  .mobile-content .bill-subsec {
+    margin-top: 12px; padding-left: 16px;
+  }
+  .mobile-content .bill-cap-item {
+    margin-top: 10px; padding-left: 32px;
+  }
+  .mobile-content .bill-item {
+    margin-top: 10px; padding-left: 32px;
+  }
+  .mobile-content .bill-roman-item {
+    margin-top: 8px; padding-left: 48px;
+  }
+  .mobile-content blockquote {
+    margin: 0; padding-left: 16px;
+    border-left: 3px solid #e8d0d9;
+  }
+  .mobile-content blockquote blockquote {
+    padding-left: 12px;
   }
 
   .selection-toolbar {
@@ -77,15 +118,13 @@
     border-radius: 10px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.25);
     padding: 6px; gap: 4px;
-    align-items: center;
-    transform: translateX(-50%);
+    align-items: center; transform: translateX(-50%);
   }
   .selection-toolbar.visible { display: flex; }
   .selection-toolbar button {
     padding: 8px 14px; border: none; border-radius: 7px;
     font-size: 13px; font-weight: 600; cursor: pointer;
     display: flex; align-items: center; gap: 6px;
-    transition: background 0.15s;
   }
   .toolbar-copy { background: #8f2347; color: #fff; }
   .toolbar-copy:hover { background: #6b1a35; }
@@ -115,10 +154,8 @@
     font-size: 20px; cursor: pointer;
     box-shadow: 0 2px 10px rgba(0,0,0,0.25);
     display: flex; align-items: center; justify-content: center;
-    transition: background 0.2s;
   }
   .toc-toggle:hover { background: #fff; }
-
   .search-toggle {
     position: fixed; top: 14px; right: 14px; z-index: 400;
     width: 44px; height: 44px; border-radius: 50%;
@@ -126,7 +163,6 @@
     font-size: 20px; cursor: pointer;
     box-shadow: 0 2px 10px rgba(0,0,0,0.25);
     display: flex; align-items: center; justify-content: center;
-    transition: background 0.2s;
   }
   .search-toggle:hover { background: #fff; }
 
@@ -134,12 +170,10 @@
     position: fixed; top: 0; right: 0; z-index: 350;
     width: 360px; max-width: 90vw; height: 100vh;
     background: #fff; box-shadow: -4px 0 20px rgba(0,0,0,0.15);
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
+    transform: translateX(100%); transition: transform 0.3s ease;
     display: flex; flex-direction: column; overflow: hidden;
   }
   .search-panel.open { transform: translateX(0); }
-
   .search-header {
     padding: 16px; border-bottom: 2px solid #8f2347;
     display: flex; gap: 8px; align-items: center;
@@ -154,30 +188,15 @@
     border: none; border-radius: 8px; font-size: 14px;
     cursor: pointer; font-weight: 600;
   }
-  .search-header button:hover { background: #6b1a35; }
-
-  .search-status {
-    padding: 10px 16px; font-size: 12px; color: #888;
-    border-bottom: 1px solid #eee;
-  }
-
-  .search-results {
-    flex: 1; overflow-y: auto; padding: 8px 0;
-    scrollbar-width: thin; scrollbar-color: #8f2347 #f5f0f2;
-  }
-  .search-results::-webkit-scrollbar { width: 6px; }
-  .search-results::-webkit-scrollbar-thumb { background: #8f2347; border-radius: 3px; }
-
+  .search-status { padding: 10px 16px; font-size: 12px; color: #888; border-bottom: 1px solid #eee; }
+  .search-results { flex: 1; overflow-y: auto; padding: 8px 0; }
   .search-result-item {
     display: block; width: 100%; text-align: left;
     padding: 12px 16px; border: none; background: none;
     font-size: 13px; color: #333; cursor: pointer;
-    border-left: 3px solid transparent;
-    transition: all 0.15s ease; line-height: 1.5;
+    border-left: 3px solid transparent; line-height: 1.5;
   }
-  .search-result-item:hover {
-    background: #faf0f3; border-left-color: #8f2347; color: #8f2347;
-  }
+  .search-result-item:hover { background: #faf0f3; border-left-color: #8f2347; color: #8f2347; }
   .search-result-item .result-page { font-size: 11px; color: #8f2347; font-weight: 600; }
   .search-result-item mark { background: #f8d0de; color: #8f2347; padding: 0 2px; border-radius: 2px; }
 
@@ -185,41 +204,21 @@
     position: fixed; top: 0; left: 0; z-index: 350;
     width: 320px; max-width: 85vw; height: 100vh;
     background: #fff; box-shadow: 4px 0 20px rgba(0,0,0,0.15);
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
+    transform: translateX(-100%); transition: transform 0.3s ease;
     display: flex; flex-direction: column; overflow: hidden;
   }
   .toc-panel.open { transform: translateX(0); }
-
-  .toc-header {
-    padding: 20px 20px 14px 20px;
-    border-bottom: 2px solid #8f2347;
-  }
-  .toc-header h2 {
-    font-size: 15px; font-weight: 700; color: #8f2347;
-    letter-spacing: 0.5px; text-transform: uppercase;
-  }
-
-  .toc-list {
-    flex: 1; overflow-y: auto; padding: 8px 0;
-    scrollbar-width: thin; scrollbar-color: #8f2347 #f5f0f2;
-  }
-  .toc-list::-webkit-scrollbar { width: 6px; }
-  .toc-list::-webkit-scrollbar-thumb { background: #8f2347; border-radius: 3px; }
-
+  .toc-header { padding: 20px 20px 14px; border-bottom: 2px solid #8f2347; }
+  .toc-header h2 { font-size: 15px; font-weight: 700; color: #8f2347; letter-spacing: 0.5px; text-transform: uppercase; }
+  .toc-list { flex: 1; overflow-y: auto; padding: 8px 0; }
   .toc-item {
     display: block; width: 100%; text-align: left;
     padding: 14px 20px; border: none; background: none;
     font-size: 14px; color: #333; cursor: pointer;
-    border-left: 3px solid transparent;
-    transition: all 0.15s ease; line-height: 1.4;
+    border-left: 3px solid transparent; line-height: 1.4;
   }
-  .toc-item:hover {
-    background: #faf0f3; border-left-color: #8f2347; color: #8f2347;
-  }
-  .toc-item .page-num {
-    display: block; font-size: 11px; color: #999; margin-top: 2px;
-  }
+  .toc-item:hover { background: #faf0f3; border-left-color: #8f2347; color: #8f2347; }
+  .toc-item .page-num { display: block; font-size: 11px; color: #999; margin-top: 2px; }
 
   .panel-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -228,9 +227,7 @@
   }
   .panel-overlay.open { opacity: 1; pointer-events: auto; }
 
-  .loading-msg {
-    text-align: center; padding: 80px 20px; color: #555; font-size: 16px;
-  }
+  .loading-msg { text-align: center; padding: 80px 20px; color: #555; font-size: 16px; }
   .loading-msg .spinner {
     display: inline-block; width: 28px; height: 28px;
     border: 3px solid #ddd; border-top-color: #8f2347;
@@ -242,8 +239,7 @@
     .title-bar { padding: 12px 50px; }
     .title-bar .title-main { font-size: 17px; letter-spacing: 1px; }
     .title-bar .subtitle { font-size: 10px; }
-    #page-container { padding: 8px 0; gap: 6px; }
-    .page-wrapper { box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    #page-container { padding: 4px 0; gap: 0; }
     .page-indicator { bottom: 10px; right: 14px; font-size: 12px; padding: 5px 11px; }
     .toc-toggle { top: 10px; left: 10px; width: 40px; height: 40px; font-size: 18px; }
     .search-toggle { top: 10px; right: 10px; width: 40px; height: 40px; font-size: 18px; }
@@ -293,6 +289,7 @@
 
 <script type="module">
   const PDF_URL = 'The_MAD_Act_Complete_Final.pdf';
+  const MOBILE_URL = 'mobile_content.html';
 
   const TOC = [
     {label: "Sec. 1 — Short Title & Table of Contents", page: 0},
@@ -308,8 +305,20 @@
     {label: "Title IX — Political Violence Investigation Accountability", page: 650},
   ];
 
-  const pdfjsLib = await import("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs");
-  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
+  // TOC anchor IDs for mobile text search
+  const TOC_ANCHORS = [
+    "SEC. 1. SHORT TITLE",
+    "SEC. 2. FINDINGS AND PURPOSE",
+    "TITLE I",
+    "TITLE II",
+    "TITLE III",
+    "TITLE IV",
+    "TITLE V",
+    "TITLE VI",
+    "TITLE VII",
+    "TITLE VIII",
+    "TITLE IX",
+  ];
 
   const container = document.getElementById("page-container");
   const wrapper = document.getElementById("viewer-wrapper");
@@ -330,6 +339,8 @@
   const toolbarCopy = document.getElementById("toolbar-copy");
   const toolbarTweet = document.getElementById("toolbar-tweet");
 
+  const isMobile = () => window.innerWidth <= 720;
+
   function getTargetWidth() {
     return wrapper.clientWidth - 40;
   }
@@ -340,120 +351,35 @@
     panelOverlay.classList.remove("open");
   }
   function openToc() {
-    closeAll();
-    tocPanel.classList.add("open");
-    panelOverlay.classList.add("open");
+    closeAll(); tocPanel.classList.add("open"); panelOverlay.classList.add("open");
   }
   function openSearch() {
-    closeAll();
-    searchPanel.classList.add("open");
-    panelOverlay.classList.add("open");
+    closeAll(); searchPanel.classList.add("open"); panelOverlay.classList.add("open");
     setTimeout(() => searchInput.focus(), 300);
   }
-  tocToggle.addEventListener("click", () => {
-    tocPanel.classList.contains("open") ? closeAll() : openToc();
-  });
-  searchToggle.addEventListener("click", () => {
-    searchPanel.classList.contains("open") ? closeAll() : openSearch();
-  });
+  tocToggle.addEventListener("click", () => { tocPanel.classList.contains("open") ? closeAll() : openToc(); });
+  searchToggle.addEventListener("click", () => { searchPanel.classList.contains("open") ? closeAll() : openSearch(); });
   panelOverlay.addEventListener("click", closeAll);
-
-  let placeholders = [], rendered = new Set(), totalPages = 0;
-  let pageTextCache = {};
-
-  async function renderPage(pdf, pageNum) {
-    if (rendered.has(pageNum)) return;
-    rendered.add(pageNum);
-    const page = await pdf.getPage(pageNum);
-    const uv = page.getViewport({ scale: 1 });
-    const tw = getTargetWidth();
-    const scale = tw / uv.width;
-    const vp = page.getViewport({ scale });
-    const dpr = window.devicePixelRatio || 1;
-
-    const canvas = document.createElement("canvas");
-    canvas.width = vp.width * dpr;
-    canvas.height = vp.height * dpr;
-    canvas.style.width = vp.width + "px";
-    canvas.style.height = vp.height + "px";
-    const ctx = canvas.getContext("2d");
-    ctx.scale(dpr, dpr);
-    await page.render({ canvasContext: ctx, viewport: vp }).promise;
-
-    const textContent = await page.getTextContent();
-    const textLayerDiv = document.createElement("div");
-    textLayerDiv.className = "text-layer";
-    textLayerDiv.style.width = vp.width + "px";
-    textLayerDiv.style.height = vp.height + "px";
-
-    textContent.items.forEach(item => {
-      const tx = pdfjsLib.Util.transform(vp.transform, item.transform);
-      const span = document.createElement("span");
-      span.textContent = item.str;
-      const fontHeight = Math.sqrt(tx[2] * tx[2] + tx[3] * tx[3]);
-      span.style.left = tx[4] + "px";
-      span.style.top = (vp.height - tx[5]) + "px";
-      span.style.fontSize = fontHeight + "px";
-      span.style.fontFamily = item.fontName || "serif";
-      textLayerDiv.appendChild(span);
-    });
-
-    const pageWrapper = document.createElement("div");
-    pageWrapper.className = "page-wrapper";
-    pageWrapper.style.width = vp.width + "px";
-    pageWrapper.style.height = vp.height + "px";
-    pageWrapper.appendChild(canvas);
-    pageWrapper.appendChild(textLayerDiv);
-
-    const ph = placeholders[pageNum - 1];
-    ph.style.minHeight = "";
-    ph.replaceChildren(pageWrapper);
-  }
-
-  function goToPage(pageIndex) {
-    const target = placeholders[pageIndex];
-    if (target && window._pdf) {
-      for (let p = pageIndex; p <= Math.min(pageIndex + 10, totalPages - 1); p++) {
-        renderPage(window._pdf, p + 1);
-      }
-      setTimeout(() => target.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
-    }
-  }
-
-  // TOC
-  TOC.forEach((item) => {
-    const btn = document.createElement("button");
-    btn.className = "toc-item";
-    btn.innerHTML = item.label + '<span class="page-num">Page ' + (item.page + 1) + '</span>';
-    btn.addEventListener("click", () => { goToPage(item.page); closeAll(); });
-    tocList.appendChild(btn);
-  });
 
   // Selection toolbar
   function showToolbar() {
     const sel = window.getSelection();
     if (!sel || sel.isCollapsed || !sel.toString().trim()) {
-      selToolbar.classList.remove("visible");
-      return;
+      selToolbar.classList.remove("visible"); return;
     }
     const range = sel.getRangeAt(0);
     const rect = range.getBoundingClientRect();
     selToolbar.style.left = (rect.left + rect.width / 2) + "px";
-    selToolbar.style.top = (rect.top - 50) + "px";
-    if (rect.top < 60) {
-      selToolbar.style.top = (rect.bottom + 10) + "px";
-    }
+    selToolbar.style.top = (rect.top < 60 ? rect.bottom + 10 : rect.top - 50) + "px";
     toolbarCopy.innerHTML = "&#128203; Copy";
     toolbarCopy.className = "toolbar-copy";
     selToolbar.classList.add("visible");
   }
-
   document.addEventListener("mouseup", () => setTimeout(showToolbar, 10));
   document.addEventListener("touchend", () => setTimeout(showToolbar, 100));
   document.addEventListener("mousedown", (e) => {
     if (!selToolbar.contains(e.target)) selToolbar.classList.remove("visible");
   });
-
   toolbarCopy.addEventListener("click", () => {
     const text = window.getSelection().toString();
     if (text) {
@@ -464,7 +390,6 @@
       });
     }
   });
-
   toolbarTweet.addEventListener("click", () => {
     const text = window.getSelection().toString().substring(0, 250);
     if (text) {
@@ -475,109 +400,251 @@
     }
   });
 
-  // Search
-  async function getPageText(pdf, pageNum) {
-    if (pageTextCache[pageNum]) return pageTextCache[pageNum];
-    const page = await pdf.getPage(pageNum);
-    const content = await page.getTextContent();
-    const text = content.items.map(item => item.str).join(" ");
-    pageTextCache[pageNum] = text;
-    return text;
-  }
-
-  async function doSearch(query) {
-    if (!query.trim() || !window._pdf) return;
-    const q = query.trim().toLowerCase();
-    searchResults.innerHTML = "";
-    searchStatus.textContent = "Searching…";
-    const matches = [];
-    for (let i = 1; i <= totalPages; i++) {
-      const text = await getPageText(window._pdf, i);
-      const lower = text.toLowerCase();
-      const idx = lower.indexOf(q);
-      if (idx !== -1) {
-        const start = Math.max(0, idx - 40);
-        const end = Math.min(text.length, idx + q.length + 40);
-        let snippet = (start > 0 ? "…" : "") + text.substring(start, end) + (end < text.length ? "…" : "");
-        matches.push({ page: i, snippet });
-      }
-      if (i % 50 === 0) {
-        searchStatus.textContent = "Searching… (page " + i + " of " + totalPages + ")";
-        await new Promise(r => setTimeout(r, 0));
-      }
-    }
-    if (matches.length === 0) {
-      searchStatus.textContent = "No results found.";
-      return;
-    }
-    searchStatus.textContent = matches.length + " page" + (matches.length !== 1 ? "s" : "") + " found";
-    matches.forEach(m => {
-      const btn = document.createElement("button");
-      btn.className = "search-result-item";
-      const highlighted = m.snippet.replace(new RegExp("(" + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ")", "gi"), "<mark>$1</mark>");
-      btn.innerHTML = '<span class="result-page">Page ' + m.page + '</span> ' + highlighted;
-      btn.addEventListener("click", () => { goToPage(m.page - 1); closeAll(); });
-      searchResults.appendChild(btn);
-    });
-  }
-
-  searchBtn.addEventListener("click", () => doSearch(searchInput.value));
-  searchInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") doSearch(searchInput.value);
+  // Scroll progress
+  wrapper.addEventListener("scroll", () => {
+    const pct = wrapper.scrollHeight - wrapper.clientHeight > 0
+      ? (wrapper.scrollTop / (wrapper.scrollHeight - wrapper.clientHeight)) * 100 : 0;
+    progressFill.style.width = pct + "%";
   });
 
-  // Load PDF
-  try {
-    const pdf = await pdfjsLib.getDocument(PDF_URL).promise;
-    window._pdf = pdf;
-    loading.remove();
-    totalPages = pdf.numPages;
-    const BATCH = 10;
+  // ═══════════════════════════════════════════════
+  // MOBILE MODE — loads structured HTML from docx
+  // ═══════════════════════════════════════════════
+  if (isMobile()) {
+    loading.innerHTML = '<div class="spinner" style="display:inline-block;width:28px;height:28px;border:3px solid #ddd;border-top-color:#8f2347;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:16px;"></div><div>Loading the MAD Act…</div>';
 
-    for (let i = 1; i <= totalPages; i++) {
-      const div = document.createElement("div");
-      div.dataset.page = i;
-      div.style.minHeight = "880px";
-      container.appendChild(div);
-      placeholders.push(div);
+    fetch(MOBILE_URL)
+      .then(r => r.text())
+      .then(html => {
+        loading.remove();
+        const div = document.createElement("div");
+        div.className = "mobile-content";
+        div.innerHTML = html;
+        container.appendChild(div);
+
+        // Build TOC for mobile — find headings and scroll to them
+        TOC.forEach((item, idx) => {
+          const btn = document.createElement("button");
+          btn.className = "toc-item";
+          btn.innerHTML = item.label;
+          btn.addEventListener("click", () => {
+            const anchor = TOC_ANCHORS[idx];
+            // Find the element containing this text
+            const allEls = div.querySelectorAll("p, blockquote p");
+            for (const el of allEls) {
+              if (el.textContent.includes(anchor)) {
+                el.scrollIntoView({ behavior: "smooth", block: "start" });
+                break;
+              }
+            }
+            closeAll();
+          });
+          tocList.appendChild(btn);
+        });
+
+        // Mobile search — searches the HTML text content
+        function doMobileSearch(query) {
+          if (!query.trim()) return;
+          const q = query.trim().toLowerCase();
+          searchResults.innerHTML = "";
+          const allEls = div.querySelectorAll("p");
+          const matches = [];
+          allEls.forEach(el => {
+            const text = el.textContent;
+            const idx = text.toLowerCase().indexOf(q);
+            if (idx !== -1) {
+              const start = Math.max(0, idx - 40);
+              const end = Math.min(text.length, idx + q.length + 40);
+              let snippet = (start > 0 ? "…" : "") + text.substring(start, end) + (end < text.length ? "…" : "");
+              matches.push({ el, snippet });
+            }
+          });
+          if (!matches.length) { searchStatus.textContent = "No results found."; return; }
+          searchStatus.textContent = matches.length + " result" + (matches.length !== 1 ? "s" : "") + " found";
+          matches.slice(0, 100).forEach(m => {
+            const btn = document.createElement("button");
+            btn.className = "search-result-item";
+            const hl = m.snippet.replace(new RegExp("(" + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ")", "gi"), "<mark>$1</mark>");
+            btn.innerHTML = hl;
+            btn.addEventListener("click", () => { m.el.scrollIntoView({ behavior: "smooth", block: "start" }); closeAll(); });
+            searchResults.appendChild(btn);
+          });
+        }
+        searchBtn.addEventListener("click", () => doMobileSearch(searchInput.value));
+        searchInput.addEventListener("keydown", (e) => { if (e.key === "Enter") doMobileSearch(searchInput.value); });
+      })
+      .catch(err => {
+        loading.innerHTML = '<div style="color:#c00;">Error loading mobile content: ' + err.message + '</div>';
+      });
+
+  // ═══════════════════════════════════════════════
+  // DESKTOP MODE — renders PDF pages via PDF.js
+  // ═══════════════════════════════════════════════
+  } else {
+    const pdfjsLib = await import("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs");
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
+
+    let placeholders = [], rendered = new Set(), totalPages = 0;
+    let pageTextCache = {};
+
+    async function renderPage(pdf, pageNum) {
+      if (rendered.has(pageNum)) return;
+      rendered.add(pageNum);
+      const page = await pdf.getPage(pageNum);
+      const uv = page.getViewport({ scale: 1 });
+      const tw = getTargetWidth();
+      const scale = tw / uv.width;
+      const vp = page.getViewport({ scale });
+      const dpr = window.devicePixelRatio || 1;
+
+      const canvas = document.createElement("canvas");
+      canvas.width = vp.width * dpr;
+      canvas.height = vp.height * dpr;
+      canvas.style.width = vp.width + "px";
+      canvas.style.height = vp.height + "px";
+      const ctx = canvas.getContext("2d");
+      ctx.scale(dpr, dpr);
+      await page.render({ canvasContext: ctx, viewport: vp }).promise;
+
+      const textContent = await page.getTextContent();
+      const textLayerDiv = document.createElement("div");
+      textLayerDiv.className = "text-layer";
+      textLayerDiv.style.width = vp.width + "px";
+      textLayerDiv.style.height = vp.height + "px";
+
+      textContent.items.forEach(item => {
+        const tx = pdfjsLib.Util.transform(vp.transform, item.transform);
+        const span = document.createElement("span");
+        span.textContent = item.str;
+        const fh = Math.sqrt(tx[2]*tx[2] + tx[3]*tx[3]);
+        span.style.left = tx[4] + "px";
+        span.style.top = (vp.height - tx[5]) + "px";
+        span.style.fontSize = fh + "px";
+        textLayerDiv.appendChild(span);
+      });
+
+      const pw = document.createElement("div");
+      pw.className = "page-wrapper";
+      pw.style.width = vp.width + "px";
+      pw.style.height = vp.height + "px";
+      pw.appendChild(canvas);
+      pw.appendChild(textLayerDiv);
+
+      const ph = placeholders[pageNum - 1];
+      ph.style.minHeight = "";
+      ph.replaceChildren(pw);
     }
 
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          const p = parseInt(entry.target.dataset.page);
-          for (let i = p; i <= Math.min(p + BATCH, totalPages); i++) renderPage(pdf, i);
+    function goToPage(pageIndex) {
+      const target = placeholders[pageIndex];
+      if (target && window._pdf) {
+        for (let p = pageIndex; p <= Math.min(pageIndex + 10, totalPages - 1); p++) {
+          renderPage(window._pdf, p + 1);
         }
+        setTimeout(() => target.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
       }
-    }, { root: wrapper, rootMargin: "1500px" });
+    }
 
-    placeholders.forEach(div => observer.observe(div));
-    for (let p = 1; p <= Math.min(BATCH, totalPages); p++) renderPage(pdf, p);
-
-    let indicatorTimeout;
-    wrapper.addEventListener("scroll", () => {
-      const scrollTop = wrapper.scrollTop;
-      const scrollHeight = wrapper.scrollHeight - wrapper.clientHeight;
-      const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
-      progressFill.style.width = pct + "%";
-
-      let currentPage = 1;
-      for (let i = 0; i < placeholders.length; i++) {
-        const rect = placeholders[i].getBoundingClientRect();
-        const wrapperRect = wrapper.getBoundingClientRect();
-        if (rect.top <= wrapperRect.top + wrapperRect.height * 0.3) currentPage = i + 1;
-      }
-      pageIndicator.textContent = "Page " + currentPage + " of " + totalPages;
-      pageIndicator.classList.add("visible");
-      clearTimeout(indicatorTimeout);
-      indicatorTimeout = setTimeout(() => pageIndicator.classList.remove("visible"), 1500);
+    // TOC for desktop
+    TOC.forEach((item) => {
+      const btn = document.createElement("button");
+      btn.className = "toc-item";
+      btn.innerHTML = item.label + '<span class="page-num">Page ' + (item.page + 1) + '</span>';
+      btn.addEventListener("click", () => { goToPage(item.page); closeAll(); });
+      tocList.appendChild(btn);
     });
 
-  } catch (err) {
-    loading.innerHTML = '<div style="color:#c00;">Error loading PDF. Make sure the PDF file is hosted at the same location as this HTML file.<br><br>' + err.message + '</div>';
-    console.error(err);
+    // Desktop search
+    async function getPageText(pdf, pageNum) {
+      if (pageTextCache[pageNum]) return pageTextCache[pageNum];
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent();
+      const text = content.items.map(i => i.str).join(" ");
+      pageTextCache[pageNum] = text;
+      return text;
+    }
+    async function doSearch(query) {
+      if (!query.trim() || !window._pdf) return;
+      const q = query.trim().toLowerCase();
+      searchResults.innerHTML = "";
+      searchStatus.textContent = "Searching…";
+      const matches = [];
+      for (let i = 1; i <= totalPages; i++) {
+        const text = await getPageText(window._pdf, i);
+        const idx = text.toLowerCase().indexOf(q);
+        if (idx !== -1) {
+          const start = Math.max(0, idx - 40);
+          const end = Math.min(text.length, idx + q.length + 40);
+          let snippet = (start > 0 ? "…" : "") + text.substring(start, end) + (end < text.length ? "…" : "");
+          matches.push({ page: i, snippet });
+        }
+        if (i % 50 === 0) {
+          searchStatus.textContent = "Searching… (page " + i + " of " + totalPages + ")";
+          await new Promise(r => setTimeout(r, 0));
+        }
+      }
+      if (!matches.length) { searchStatus.textContent = "No results found."; return; }
+      searchStatus.textContent = matches.length + " page" + (matches.length !== 1 ? "s" : "") + " found";
+      matches.forEach(m => {
+        const btn = document.createElement("button");
+        btn.className = "search-result-item";
+        const hl = m.snippet.replace(new RegExp("(" + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ")", "gi"), "<mark>$1</mark>");
+        btn.innerHTML = '<span class="result-page">Page ' + m.page + '</span> ' + hl;
+        btn.addEventListener("click", () => { goToPage(m.page - 1); closeAll(); });
+        searchResults.appendChild(btn);
+      });
+    }
+    searchBtn.addEventListener("click", () => doSearch(searchInput.value));
+    searchInput.addEventListener("keydown", (e) => { if (e.key === "Enter") doSearch(searchInput.value); });
+
+    // Load PDF
+    try {
+      const pdf = await pdfjsLib.getDocument(PDF_URL).promise;
+      window._pdf = pdf;
+      loading.remove();
+      totalPages = pdf.numPages;
+      const BATCH = 10;
+
+      for (let i = 1; i <= totalPages; i++) {
+        const div = document.createElement("div");
+        div.dataset.page = i;
+        div.style.minHeight = "880px";
+        container.appendChild(div);
+        placeholders.push(div);
+      }
+
+      const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const p = parseInt(entry.target.dataset.page);
+            for (let i = p; i <= Math.min(p + BATCH, totalPages); i++) renderPage(pdf, i);
+          }
+        }
+      }, { root: wrapper, rootMargin: "1500px" });
+
+      placeholders.forEach(div => observer.observe(div));
+      for (let p = 1; p <= Math.min(BATCH, totalPages); p++) renderPage(pdf, p);
+
+      // Page indicator for desktop
+      let indicatorTimeout;
+      wrapper.addEventListener("scroll", () => {
+        let currentPage = 1;
+        for (let i = 0; i < placeholders.length; i++) {
+          const rect = placeholders[i].getBoundingClientRect();
+          const wr = wrapper.getBoundingClientRect();
+          if (rect.top <= wr.top + wr.height * 0.3) currentPage = i + 1;
+        }
+        pageIndicator.textContent = "Page " + currentPage + " of " + totalPages;
+        pageIndicator.classList.add("visible");
+        clearTimeout(indicatorTimeout);
+        indicatorTimeout = setTimeout(() => pageIndicator.classList.remove("visible"), 1500);
+      });
+
+    } catch (err) {
+      loading.innerHTML = '<div style="color:#c00;">Error loading PDF: ' + err.message + '</div>';
+      console.error(err);
+    }
   }
 </script>
-
 </body>
 </html>
